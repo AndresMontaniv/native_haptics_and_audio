@@ -114,7 +114,7 @@ class NativeHapticsAndAudioPlugin :
         when (haptic) {
             PosHaptic.SUCCESS -> {
                 vibrator.vibrate(
-                    VibrationEffect.createOneShot(20, VibrationEffect.DEFAULT_AMPLITUDE)
+                    VibrationEffect.createOneShot(65, 255)
                 )
             }
             PosHaptic.WARNING -> {
