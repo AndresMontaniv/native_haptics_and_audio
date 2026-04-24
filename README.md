@@ -1,15 +1,80 @@
 # native_haptics_and_audio
 
-A new Flutter plugin project.
+A high-performance Flutter plugin delivering ultra-low latency audio and haptic feedback for POS (Point of Sale) barcode scanners. 
 
-## Getting Started
+By bypassing heavy standard audio packages and leveraging raw native hardware APIs with pre-bundled, uncompressed 16-bit PCM sounds, it guarantees instant, zero-lag physical and auditory responses on Android and iOS.
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/to/develop-plugins),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+## Why this package?
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Standard Flutter audio plugins rely on heavy bridge serialization and decompression, which introduces a microscopic but noticeable lag. If a cashier is scanning 50 items a minute, even a 100ms audio delay feels sluggish. 
 
+This plugin solves that by:
+1. **Pre-loading** uncompressed `.wav` assets directly into native RAM (using Android's `SoundPool` and iOS's `AudioServices`).
+2. **Utilizing Native Hardware:** Triggering raw ERM motor APIs on Android and the `UIImpactFeedbackGenerator` on iOS for perfectly crisp, mechanical haptic "ticks".
+3. **Type Safety:** Using `pigeon` to guarantee stable, crash-free bridge communication.
+
+## Features
+
+* **Zero-Latency Audio:** Instantly play POS-specific sounds (`scannerBeep`, `warningBeep`, `doubleWarningBeep`, `kaching`).
+* **Optimized Haptics:** Trigger mathematically tuned POS haptic profiles (`success`, `warning`, `error`).
+* **Platform Safe:** Safely swallows method calls on unsupported desktop/web platforms without crashing your cross-platform app.
+
+## Installation
+
+Add the dependency to your `pubspec.yaml`:
+
+```yaml
+dependencies:
+  native_haptics_and_audio: ^1.0.0
+```
+
+## Quick Start
+
+You only need to interact with the singleton `NativeHapticsAndAudioRepository`. 
+
+### 1. Initialization
+You **must** initialize the repository before playing sounds. This allows the native background threads to load the audio files into RAM. A great place to do this is in your scanner screen's `initState`.
+
+```dart
+import 'package:native_haptics_and_audio/native_haptics_and_audio.dart';
+
+@override
+void initState() {
+  super.initState();
+  // Pre-loads native hardware. Safe to call multiple times.
+  NativeHapticsAndAudioRepository.instance.initialize();
+}
+```
+
+### 2. Triggering Feedback
+Trigger the ultra-low latency feedback based on your business logic:
+
+```dart
+// A successful scan
+void onScanSuccess() {
+  NativeHapticsAndAudioRepository.instance.playSound(PosSound.scannerBeep);
+  NativeHapticsAndAudioRepository.instance.playHaptic(PosHaptic.success);
+}
+
+// A failed or unrecognized scan
+void onScanError() {
+  NativeHapticsAndAudioRepository.instance.playSound(PosSound.doubleWarningBeep);
+  NativeHapticsAndAudioRepository.instance.playHaptic(PosHaptic.error);
+}
+```
+
+### 3. Cleanup (Optional but Recommended)
+To free up native RAM, release the hardware bindings when your scanner screen is disposed.
+
+```dart
+@override
+void dispose() {
+  NativeHapticsAndAudioRepository.instance.release();
+  super.dispose();
+}
+```
+
+## Supported Platforms
+* **Android** (API 21+)
+* **iOS** (11.0+)
+*(Note: Method calls on Windows, macOS, Linux, and Web will gracefully return without crashing).*
