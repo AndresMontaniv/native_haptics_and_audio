@@ -1,7 +1,9 @@
 name: native_haptics_and_audio
-description: "A new Flutter plugin project."
-version: 0.0.1
-homepage:
+description: A high-performance Flutter plugin delivering ultra-low latency audio and haptic feedback for POS barcode scanners. By bypassing heavy audio packages and leveraging native hardware APIs with pre-bundled uncompressed sounds, it guarantees instant, zero-lag physical and auditory responses on Android and iOS.
+version: 1.0.0
+homepage: https://github.com/andresmontaniv/native_haptics_and_audio
+repository: https://github.com/andresmontaniv/native_haptics_and_audio
+issue_tracker: https://github.com/andresmontaniv/native_haptics_and_audio/issues
 
 environment:
   sdk: ^3.11.4
