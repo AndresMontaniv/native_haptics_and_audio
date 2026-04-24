@@ -104,7 +104,7 @@ class NativeHapticsAndAudioPlugin :
     /**
      * Triggers a native haptic vibration pattern.
      *
-     * - [PosHaptic.SUCCESS] → short tick  (20 ms)
+     * - [PosHaptic.SUCCESS] → short tick  (65 ms)
      * - [PosHaptic.WARNING] → medium buzz (100 ms)
      * - [PosHaptic.ERROR]   → heavy double-buzz (0, 80, 100, 80 ms pattern)
      */
@@ -114,7 +114,7 @@ class NativeHapticsAndAudioPlugin :
         when (haptic) {
             PosHaptic.SUCCESS -> {
                 vibrator.vibrate(
-                    VibrationEffect.createOneShot(65, 255)
+                    VibrationEffect.createOneShot(65, VibrationEffect.DEFAULT_AMPLITUDE)
                 )
             }
             PosHaptic.WARNING -> {
