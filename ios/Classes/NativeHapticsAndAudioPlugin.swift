@@ -6,13 +6,12 @@ import AVFoundation
 /// iOS implementation of the `HapticsAndAudioApi` Pigeon protocol.
 ///
 /// Uses `AudioServicesCreateSystemSoundID` for zero-latency PCM playback
-/// and `UINotificationFeedbackGenerator` for native haptic feedback.
+/// and `UIImpactFeedbackGenerator` / `UINotificationFeedbackGenerator` for native haptic feedback.
 public class NativeHapticsAndAudioPlugin: NSObject, FlutterPlugin, HapticsAndAudioApi {
 
     // MARK: - Properties
 
     private var soundIds: [PosSound: SystemSoundID] = [:]
-    private var feedbackGenerator: UINotificationFeedbackGenerator?
 
     /// Maps each `PosSound` enum value to its corresponding `.wav` filename.
     private static let soundFileNames: [PosSound: String] = [
@@ -34,8 +33,7 @@ public class NativeHapticsAndAudioPlugin: NSObject, FlutterPlugin, HapticsAndAud
 
     // MARK: - HapticsAndAudioApi
 
-    /// Pre-loads all `.wav` assets into RAM via `AudioServicesCreateSystemSoundID`
-    /// and prepares the haptic feedback generator.
+    /// Pre-loads all `.wav` assets into RAM via `AudioServicesCreateSystemSoundID`.
     ///
     /// The resource bundle lookup follows a two-tier strategy:
     /// 1. Look in the CocoaPods-generated resource bundle (`native_haptics_and_audio`).
@@ -71,9 +69,7 @@ public class NativeHapticsAndAudioPlugin: NSObject, FlutterPlugin, HapticsAndAud
                 soundIds[sound] = systemSoundId
             }
 
-            // --- Prepare the haptic generator ---
-            feedbackGenerator = UINotificationFeedbackGenerator()
-            feedbackGenerator?.prepare()
+            // Haptic generators are lightweight and instantiated on demand in playHaptic().
 
             completion(.success(()))
         } catch {
@@ -93,37 +89,38 @@ public class NativeHapticsAndAudioPlugin: NSObject, FlutterPlugin, HapticsAndAud
         AudioServicesPlaySystemSound(systemSoundId)
     }
 
-    /// Triggers a native haptic notification matching the given [haptic] type.
+    /// Triggers a native haptic pattern matching the given [haptic] type.
+    ///
+    /// Uses `UIImpactFeedbackGenerator(.rigid)` for a crisp `success` tick,
+    /// and `UINotificationFeedbackGenerator` for heavier `warning` / `error` pulses.
     func playHaptic(haptic: PosHaptic) throws {
-        guard let generator = feedbackGenerator else {
-            throw PigeonError(
-                code: "HAPTIC_NOT_READY",
-                message: "Feedback generator is nil. Call initialize() first.",
-                details: nil
-            )
-        }
-
-        let feedbackType: UINotificationFeedbackGenerator.FeedbackType
         switch haptic {
         case .success:
-            feedbackType = .success
-        case .warning:
-            feedbackType = .warning
-        case .error:
-            feedbackType = .error
-        }
+            // Single, ultra-crisp mechanical tick.
+            let impactGen = UIImpactFeedbackGenerator(style: .rigid)
+            impactGen.prepare()
+            impactGen.impactOccurred()
 
-        generator.notificationOccurred(feedbackType)
-        generator.prepare() // Re-prime for next immediate use.
+        case .warning:
+            // Heavier notification pulse.
+            let notifGen = UINotificationFeedbackGenerator()
+            notifGen.prepare()
+            notifGen.notificationOccurred(.warning)
+
+        case .error:
+            // Sustained, heavy double-pulse.
+            let notifGen = UINotificationFeedbackGenerator()
+            notifGen.prepare()
+            notifGen.notificationOccurred(.error)
+        }
     }
 
-    /// Disposes all loaded `SystemSoundID` handles and nils the haptic generator.
+    /// Disposes all loaded `SystemSoundID` handles.
     func release() throws {
         for (_, systemSoundId) in soundIds {
             AudioServicesDisposeSystemSoundID(systemSoundId)
         }
         soundIds.removeAll()
-        feedbackGenerator = nil
     }
 
     // MARK: - Private helpers
