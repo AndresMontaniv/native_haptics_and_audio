@@ -67,16 +67,23 @@ private func nilOrValue<T>(_ value: Any?) -> T? {
 
 /// The set of pre-bundled POS audio assets.
 enum PosSound: Int {
+  /// Standard checkout scanner confirmation beep.
   case scannerBeep = 0
+  /// Single warning tone for attention-needed events.
   case warningBeep = 1
+  /// Urgent double-beep for errors or duplicate scans.
   case doubleWarningBeep = 2
+  /// Cash register "ka-ching" for completed transactions.
   case kaching = 3
 }
 
 /// The set of native haptic feedback types for POS interactions.
 enum PosHaptic: Int {
+  /// Crisp, short mechanical tick — confirms a successful scan.
   case success = 0
+  /// Medium-intensity pulse — signals a non-critical warning.
   case warning = 1
+  /// Heavy double-buzz — signals an error or rejected scan.
   case error = 2
 }
 

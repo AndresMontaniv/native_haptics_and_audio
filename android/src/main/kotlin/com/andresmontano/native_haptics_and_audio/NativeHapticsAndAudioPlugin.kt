@@ -74,17 +74,34 @@ class NativeHapticsAndAudioPlugin :
                     PosSound.KACHING to R.raw.kaching,
                 )
 
-                for ((sound, resId) in resourceMap) {
-                    soundIds[sound] = pool.load(context, resId, 1)
+                val expectedCount = resourceMap.size
+                var loadedCount = 0
+
+                // Wait for all assets to be decoded before signalling ready.
+                pool.setOnLoadCompleteListener { _, _, status ->
+                    if (status == 0) {
+                        loadedCount++
+                        if (loadedCount == expectedCount) {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                callback(Result.success(Unit))
+                            }
+                        }
+                    } else {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            callback(
+                                Result.failure(
+                                    FlutterError(
+                                        "AUDIO_LOAD_FAILED",
+                                        "SoundPool failed to decode an asset (status $status).",
+                                    )
+                                )
+                            )
+                        }
+                    }
                 }
 
-                // Give SoundPool a moment to finish internal decoding.
-                // SoundPool.load() is async internally; a brief yield
-                // ensures buffers are ready for instant playback.
-                kotlinx.coroutines.delay(150)
-
-                withContext(Dispatchers.Main) {
-                    callback(Result.success(Unit))
+                for ((sound, resId) in resourceMap) {
+                    soundIds[sound] = pool.load(context, resId, 1)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {

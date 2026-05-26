@@ -10,10 +10,31 @@ import 'package:pigeon/pigeon.dart';
   ),
 )
 /// The set of pre-bundled POS audio assets.
-enum PosSound { scannerBeep, warningBeep, doubleWarningBeep, kaching }
+enum PosSound {
+  /// Standard checkout scanner confirmation beep.
+  scannerBeep,
+
+  /// Single warning tone for attention-needed events.
+  warningBeep,
+
+  /// Urgent double-beep for errors or duplicate scans.
+  doubleWarningBeep,
+
+  /// Cash register "ka-ching" for completed transactions.
+  kaching,
+}
 
 /// The set of native haptic feedback types for POS interactions.
-enum PosHaptic { success, warning, error }
+enum PosHaptic {
+  /// Crisp, short mechanical tick — confirms a successful scan.
+  success,
+
+  /// Medium-intensity pulse — signals a non-critical warning.
+  warning,
+
+  /// Heavy double-buzz — signals an error or rejected scan.
+  error,
+}
 
 /// Host API for ultra-low-latency native haptic and audio feedback.
 ///

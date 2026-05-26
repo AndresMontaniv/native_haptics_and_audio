@@ -50,9 +50,13 @@ class FlutterError (
 
 /** The set of pre-bundled POS audio assets. */
 enum class PosSound(val raw: Int) {
+  /** Standard checkout scanner confirmation beep. */
   SCANNER_BEEP(0),
+  /** Single warning tone for attention-needed events. */
   WARNING_BEEP(1),
+  /** Urgent double-beep for errors or duplicate scans. */
   DOUBLE_WARNING_BEEP(2),
+  /** Cash register "ka-ching" for completed transactions. */
   KACHING(3);
 
   companion object {
@@ -64,8 +68,11 @@ enum class PosSound(val raw: Int) {
 
 /** The set of native haptic feedback types for POS interactions. */
 enum class PosHaptic(val raw: Int) {
+  /** Crisp, short mechanical tick — confirms a successful scan. */
   SUCCESS(0),
+  /** Medium-intensity pulse — signals a non-critical warning. */
   WARNING(1),
+  /** Heavy double-buzz — signals an error or rejected scan. */
   ERROR(2);
 
   companion object {
