@@ -1,3 +1,6 @@
+## 1.0.1
+* Fix pub.dev description length warning for improved SEO scoring.
+
 ## 1.0.0
 
 * Initial release.
