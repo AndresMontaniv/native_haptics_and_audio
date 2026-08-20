@@ -15,12 +15,12 @@ optimized for Point-of-Sale barcode scanning workflows.
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Andres Montano' => 'andresmontaniv@gmail.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
+  s.source_files = 'native_haptics_and_audio/Sources/native_haptics_and_audio/**/*.swift'
   s.dependency 'Flutter'
   s.platform = :ios, '13.0'
   s.resource_bundles = {
-    'native_haptics_and_audio' => ['Assets/*.wav'],
-    'native_haptics_and_audio_privacy' => ['Resources/PrivacyInfo.xcprivacy']
+    'native_haptics_and_audio' => ['native_haptics_and_audio/Sources/native_haptics_and_audio/Assets/*.wav'],
+    'native_haptics_and_audio_privacy' => ['native_haptics_and_audio/Sources/native_haptics_and_audio/Resources/PrivacyInfo.xcprivacy']
   }
 
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }

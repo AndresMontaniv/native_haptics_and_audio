@@ -35,5 +35,4 @@ flutter:
         pluginClass: NativeHapticsAndAudioPlugin
       ios:
         pluginClass: NativeHapticsAndAudioPlugin
-        swiftPackageManagerEnabled: true
 
