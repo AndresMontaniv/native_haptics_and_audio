@@ -27,7 +27,14 @@ class NativeHapticsAndAudioRepository {
         _platformOverride = platformOverride;
 
   /// The single shared instance used by production code.
-  static final instance = NativeHapticsAndAudioRepository._();
+  static NativeHapticsAndAudioRepository get instance => _instance;
+  static NativeHapticsAndAudioRepository _instance = NativeHapticsAndAudioRepository._();
+
+  /// Resets the singleton instance to a clean state.
+  @visibleForTesting
+  static void resetForTesting() {
+    _instance = NativeHapticsAndAudioRepository._();
+  }
 
   /// Creates an isolated instance backed by the given [api].
   ///
@@ -47,6 +54,7 @@ class NativeHapticsAndAudioRepository {
   final HapticsAndAudioApi _api;
   final bool? _platformOverride;
   bool _initialized = false;
+  Future<void>? _initFuture;
 
   /// Whether [initialize] has completed successfully.
   bool get isInitialized => _initialized;
@@ -76,11 +84,20 @@ class NativeHapticsAndAudioRepository {
       return;
     }
     if (_initialized) return;
+
+    if (_initFuture != null) {
+      await _initFuture;
+      return;
+    }
+
+    _initFuture = _api.initialize();
     try {
-      await _api.initialize();
+      await _initFuture;
       _initialized = true;
     } catch (e) {
       debugPrint('NativeHapticsAndAudio: init failed — $e');
+    } finally {
+      _initFuture = null;
     }
   }
 

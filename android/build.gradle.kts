@@ -19,14 +19,7 @@ android {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
-    sourceSets {
-        getByName("main") {
-            java.srcDirs("src/main/kotlin")
-        }
-        getByName("test") {
-            java.srcDirs("src/test/kotlin")
-        }
-    }
+
 
     defaultConfig {
         minSdk = 24
@@ -35,6 +28,7 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+            isReturnDefaultValues = true
             all {
                 it.useJUnitPlatform()
 
@@ -51,6 +45,7 @@ android {
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.mockito:mockito-core:5.0.0")
 }

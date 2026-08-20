@@ -76,26 +76,32 @@ class NativeHapticsAndAudioPlugin :
 
                 val expectedCount = resourceMap.size
                 var loadedCount = 0
+                val callbackFired = java.util.concurrent.atomic.AtomicBoolean(false)
 
                 // Wait for all assets to be decoded before signalling ready.
                 pool.setOnLoadCompleteListener { _, _, status ->
                     if (status == 0) {
                         loadedCount++
                         if (loadedCount == expectedCount) {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                callback(Result.success(Unit))
+                            if (callbackFired.compareAndSet(false, true)) {
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    callback(Result.success(Unit))
+                                }
                             }
                         }
                     } else {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            callback(
-                                Result.failure(
-                                    FlutterError(
-                                        "AUDIO_LOAD_FAILED",
-                                        "SoundPool failed to decode an asset (status $status).",
+                        if (callbackFired.compareAndSet(false, true)) {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                callback(
+                                    Result.failure(
+                                        FlutterError(
+                                            "AUDIO_LOAD_FAILED",
+                                            "SoundPool failed to decode an asset (status $status).",
+                                            null
+                                        )
                                     )
                                 )
-                            )
+                            }
                         }
                     }
                 }

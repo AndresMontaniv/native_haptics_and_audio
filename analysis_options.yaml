@@ -10,9 +10,9 @@ include: package:flutter_lints/flutter.yaml
 analyzer:
   language:
     # Forces explicit casting, preventing silent runtime type errors.
-    # strict-casts: true
+    strict-casts: true
     # Forces explicit variable typing when the analyzer cannot infer it.
-    # strict-inference: true
+    strict-inference: true
     # Prevents the use of generic types without specifying arguments (e.g., requires List<String> instead of just List).
     strict-raw-types: true
 
