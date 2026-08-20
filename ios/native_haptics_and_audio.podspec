@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'native_haptics_and_audio'
-  s.version          = '1.0.2'
+  s.version          = '1.1.0'
   s.summary          = 'Ultra-low latency native haptic and audio feedback for POS barcode scanners.'
   s.description      = <<-DESC
 A high-performance Flutter plugin that bypasses standard audio packages to deliver

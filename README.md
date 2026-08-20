@@ -29,7 +29,7 @@ Add the dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  native_haptics_and_audio: ^1.0.2
+  native_haptics_and_audio: ^1.1.0
 ```
 
 ## Quick Start
@@ -37,7 +37,7 @@ dependencies:
 You only need to interact with the singleton `NativeHapticsAndAudioRepository`. 
 
 ### 1. Initialization
-You **must** initialize the repository before playing sounds. This allows the native background threads to load the audio files into RAM. A great place to do this is in your scanner screen's `initState`.
+You **must** initialize the repository before playing sounds. This allows native background threads to load uncompressed audio files into RAM. A great place to do this is in your scanner screen's `initState`.
 
 ```dart
 import 'package:native_haptics_and_audio/native_haptics_and_audio.dart';
@@ -45,10 +45,11 @@ import 'package:native_haptics_and_audio/native_haptics_and_audio.dart';
 @override
 void initState() {
   super.initState();
-  // Pre-loads native hardware. Safe to call multiple times.
+  // Pre-loads native hardware. Idempotent and thread-safe.
   NativeHapticsAndAudioRepository.instance.initialize();
 }
 ```
+> **Note:** `initialize()` returns a `Future<void>`. Concurrent initialization calls are safely deduplicated and awaited behind the scenes.
 
 ### 2. Triggering Feedback
 Trigger the ultra-low latency feedback based on your business logic:
@@ -78,12 +79,30 @@ void dispose() {
 }
 ```
 
+### 4. Unit & Widget Testing
+For testing screens or services that interact with `NativeHapticsAndAudioRepository`, you can use `resetForTesting()` in your test setup/teardown to ensure complete test isolation:
+
+```dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:native_haptics_and_audio/native_haptics_and_audio.dart';
+
+void main() {
+  tearDown(() {
+    NativeHapticsAndAudioRepository.resetForTesting();
+  });
+
+  testWidgets('scanner screen test', (tester) async {
+    // ...
+  });
+}
+```
+
 ## Platform Support
 
 | Platform | Status | Notes |
 |----------|--------|-------|
-| **Android** | ✅ Supported | API 24+ (SoundPool + Vibrator) |
-| **iOS** | ✅ Supported | iOS 13.0+ (AudioServices + UIFeedbackGenerator) |
+| **Android** | ✅ Supported | API 24+ (SoundPool + Vibrator, Built-in Kotlin) |
+| **iOS** | ✅ Supported | iOS 13.0+ (AudioServices + UIFeedbackGenerator, SwiftPM & CocoaPods) |
 | **Web** | ⚪ No-op | Calls return silently |
 | **macOS** | ⚪ No-op | Calls return silently |
 | **Windows** | ⚪ No-op | Calls return silently |

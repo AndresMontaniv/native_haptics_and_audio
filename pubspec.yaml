@@ -1,6 +1,6 @@
 name: native_haptics_and_audio
 description: Ultra-low latency native haptic and audio feedback designed specifically for high-speed performance on iOS and Android.
-version: 1.0.2
+version: 1.1.0
 homepage: https://github.com/andresmontaniv/native_haptics_and_audio
 repository: https://github.com/andresmontaniv/native_haptics_and_audio
 issue_tracker: https://github.com/andresmontaniv/native_haptics_and_audio/issues
