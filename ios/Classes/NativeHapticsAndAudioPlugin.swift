@@ -125,9 +125,17 @@ public class NativeHapticsAndAudioPlugin: NSObject, FlutterPlugin, HapticsAndAud
 
     // MARK: - Private helpers
 
-    /// Resolves the CocoaPods resource bundle for this plugin, with a
-    /// `Bundle.main` fallback in case assets were flattened by the host build.
+    /// Resolves the resource bundle for this plugin.
+    ///
+    /// - Under **SwiftPM**: uses `Bundle.module`, which is synthesized automatically
+    ///   by the Swift build system for the package's declared resources.
+    /// - Under **CocoaPods**: uses the `resource_bundles` nested bundle strategy,
+    ///   with a `Bundle.main` fallback for hosts that flatten assets.
     private func resolveResourceBundle() -> Bundle {
+        #if SWIFT_PACKAGE
+        // SwiftPM synthesizes Bundle.module for the package target's resources.
+        return Bundle.module
+        #else
         // The CocoaPods `resource_bundles` directive creates a nested bundle
         // named after the key in the podspec (`native_haptics_and_audio`).
         let frameworkBundle = Bundle(for: NativeHapticsAndAudioPlugin.self)
@@ -140,5 +148,6 @@ public class NativeHapticsAndAudioPlugin: NSObject, FlutterPlugin, HapticsAndAud
 
         // Fallback: assets may have been flattened into the main app bundle.
         return Bundle.main
+        #endif
     }
 }

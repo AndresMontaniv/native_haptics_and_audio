@@ -29,7 +29,7 @@ Add the dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  native_haptics_and_audio: ^1.0.0
+  native_haptics_and_audio: ^1.0.2
 ```
 
 ## Quick Start
